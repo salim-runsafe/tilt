@@ -79,15 +79,17 @@ func (c *CloudUsernameManager) CheckUsername(ctx context.Context, st store.RStor
 
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
-		logger.Get(ctx).Debugf("error making whoami request: %v", err)
+		logger.Get(ctx).Errorf("error making whoami request: %v", err)
 		c.error()
 		return
 	}
 	req.Header.Set(TiltTokenHeaderName, string(tok))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	logger.Get(ctx).Infof("starting username lookup")
 	resp, err := c.client.Do(req)
+	logger.Get(ctx).Infof("finished username lookup")
 	if err != nil {
-		logger.Get(ctx).Debugf("error checking tilt cloud status: %v", err)
+		logger.Get(ctx).Errorf("error checking tilt cloud status: %v", err)
 		c.error()
 		return
 	}
@@ -95,29 +97,32 @@ func (c *CloudUsernameManager) CheckUsername(ctx context.Context, st store.RStor
 	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			logger.Get(ctx).Debugf("tilt cloud status request failed with status %d. error reading response body: %v", resp.StatusCode, err)
+			logger.Get(ctx).Errorf("tilt cloud status request failed with status %d. error reading response body: %v", resp.StatusCode, err)
 			c.error()
 			return
 		}
-		logger.Get(ctx).Debugf("error checking tilt cloud status: code: %d, message: %s", resp.StatusCode, string(body))
+		logger.Get(ctx).Errorf("error checking tilt cloud status: code: %d, message: %s", resp.StatusCode, string(body))
 		c.error()
 		return
 	}
 
 	responseBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		logger.Get(ctx).Debugf("error reading response body: %v", err)
-		c.error()
-		return
-	}
-	r := whoAmIResponse{}
-	err = json.NewDecoder(bytes.NewReader(responseBody)).Decode(&r)
-	if err != nil {
-		logger.Get(ctx).Debugf("error decoding tilt whoami response '%s': %v", string(responseBody), err)
+		logger.Get(ctx).Errorf("error reading response body: %v", err)
 		c.error()
 		return
 	}
 
+	logger.Get(ctx).Infof("response body: %s", responseBody)
+	r := whoAmIResponse{}
+	err = json.NewDecoder(bytes.NewReader(responseBody)).Decode(&r)
+	if err != nil {
+		logger.Get(ctx).Errorf("error decoding tilt whoami response '%s': %v", string(responseBody), err)
+		c.error()
+		return
+	}
+
+	logger.Get(ctx).Infof("dispatching")
 	st.Dispatch(store.TiltCloudUserLookedUpAction{
 		Found:                    r.Found,
 		Username:                 r.Username,
