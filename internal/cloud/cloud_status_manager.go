@@ -14,7 +14,6 @@ import (
 
 	"github.com/windmilleng/tilt/internal/cloud/cloudurl"
 	"github.com/windmilleng/tilt/internal/store"
-	"github.com/windmilleng/tilt/internal/token"
 	"github.com/windmilleng/tilt/pkg/logger"
 	"github.com/windmilleng/tilt/pkg/model"
 )
@@ -34,7 +33,7 @@ func NewStatusManager(client HttpClient, clock clockwork.Clock) *CloudStatusMana
 
 // if any of these fields change, we know we need to do a fresh lookup
 type statusRequestKey struct {
-	tiltToken token.Token
+	tiltToken model.CloudToken
 	teamID    string
 	version   model.TiltBuild
 }
@@ -177,7 +176,7 @@ func (c *CloudStatusManager) OnChange(ctx context.Context, st store.RStore) {
 	c.mu.Lock()
 	lastErrorTime := c.lastErrorTime
 	currentlyMakingRequest := c.currentlyMakingRequest
-	requestKey := statusRequestKey{teamID: state.TeamID, tiltToken: state.Token, version: state.TiltBuildInfo}
+	requestKey := statusRequestKey{teamID: state.TeamID, tiltToken: state.CloudStatus.Token, version: state.TiltBuildInfo}
 	needsLookup := c.needsLookup(requestKey)
 	c.mu.Unlock()
 

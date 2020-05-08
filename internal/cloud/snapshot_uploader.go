@@ -13,7 +13,7 @@ import (
 	"github.com/windmilleng/tilt/internal/cloud/cloudurl"
 	"github.com/windmilleng/tilt/internal/hud/webview"
 	"github.com/windmilleng/tilt/internal/store"
-	"github.com/windmilleng/tilt/internal/token"
+	"github.com/windmilleng/tilt/pkg/model"
 	proto_webview "github.com/windmilleng/tilt/pkg/webview"
 )
 
@@ -29,7 +29,7 @@ func ToSnapshot(state store.EngineState) (*proto_webview.Snapshot, error) {
 
 type SnapshotUploader interface {
 	TakeAndUpload(state store.EngineState) (SnapshotID, error)
-	Upload(token token.Token, teamID string, snapshot *proto_webview.Snapshot) (SnapshotID, error)
+	Upload(token model.CloudToken, teamID string, snapshot *proto_webview.Snapshot) (SnapshotID, error)
 	IDToSnapshotURL(id SnapshotID) string
 }
 
@@ -66,10 +66,10 @@ func (s snapshotUploader) TakeAndUpload(state store.EngineState) (SnapshotID, er
 	if err != nil {
 		return "", err
 	}
-	return s.Upload(state.Token, state.TeamID, snapshot)
+	return s.Upload(state.CloudStatus.Token, state.TeamID, snapshot)
 }
 
-func (s snapshotUploader) Upload(token token.Token, teamID string, snapshot *proto_webview.Snapshot) (SnapshotID, error) {
+func (s snapshotUploader) Upload(token model.CloudToken, teamID string, snapshot *proto_webview.Snapshot) (SnapshotID, error) {
 	b := &bytes.Buffer{}
 	jsEncoder := &runtime.JSONPb{OrigName: false, EmitDefaults: true}
 	err := jsEncoder.NewEncoder(b).Encode(snapshot)

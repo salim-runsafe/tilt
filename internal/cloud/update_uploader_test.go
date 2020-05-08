@@ -18,7 +18,6 @@ import (
 	"github.com/windmilleng/tilt/internal/testutils/httptest"
 	"github.com/windmilleng/tilt/internal/testutils/manifestbuilder"
 	"github.com/windmilleng/tilt/internal/testutils/tempdir"
-	"github.com/windmilleng/tilt/internal/token"
 	"github.com/windmilleng/tilt/pkg/model"
 	proto_webview "github.com/windmilleng/tilt/pkg/webview"
 )
@@ -115,7 +114,7 @@ func newUpdateFixture(t *testing.T) *updateFixture {
 	defer st.UnlockMutableState()
 
 	state.Features = map[string]bool{feature.UpdateHistory: true}
-	state.Token = "fake-token"
+	state.CloudStatus.Token = "fake-token"
 	state.TeamID = "fake-team"
 	state.CloudStatus.Username = "fake-username"
 
@@ -171,7 +170,7 @@ func (f *fakeSnapshotUploader) TakeAndUpload(state store.EngineState) (SnapshotI
 	return SnapshotID(fmt.Sprintf("snapshot%d", f.count)), nil
 }
 
-func (f *fakeSnapshotUploader) Upload(token token.Token, teamID string, snapshot *proto_webview.Snapshot) (SnapshotID, error) {
+func (f *fakeSnapshotUploader) Upload(token model.CloudToken, teamID string, snapshot *proto_webview.Snapshot) (SnapshotID, error) {
 	panic("not implemented")
 }
 

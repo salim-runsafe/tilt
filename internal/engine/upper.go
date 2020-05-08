@@ -29,7 +29,6 @@ import (
 	"github.com/windmilleng/tilt/internal/k8s"
 	"github.com/windmilleng/tilt/internal/sliceutils"
 	"github.com/windmilleng/tilt/internal/store"
-	"github.com/windmilleng/tilt/internal/token"
 	"github.com/windmilleng/tilt/pkg/logger"
 	"github.com/windmilleng/tilt/pkg/model"
 )
@@ -67,7 +66,7 @@ func (u Upper) Start(
 	fileName string,
 	hudEnabled bool,
 	analyticsUserOpt analytics.Opt,
-	token token.Token,
+	token model.CloudToken,
 	cloudAddress string,
 ) error {
 
@@ -617,7 +616,7 @@ func handleInitAction(ctx context.Context, engineState *store.EngineState, actio
 	engineState.AnalyticsUserOpt = action.AnalyticsUserOpt
 	engineState.EngineMode = action.EngineMode
 	engineState.CloudAddress = action.CloudAddress
-	engineState.Token = action.Token
+	engineState.CloudStatus.Token = action.Token
 	engineState.HUDEnabled = action.HUDEnabled
 
 	// NOTE(dmiller): this kicks off a Tiltfile build

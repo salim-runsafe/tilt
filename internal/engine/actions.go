@@ -9,7 +9,6 @@ import (
 
 	"github.com/windmilleng/tilt/internal/k8s"
 	"github.com/windmilleng/tilt/internal/store"
-	"github.com/windmilleng/tilt/internal/token"
 	"github.com/windmilleng/tilt/pkg/model"
 )
 
@@ -29,7 +28,7 @@ type InitAction struct {
 	AnalyticsUserOpt analytics.Opt
 
 	CloudAddress string
-	Token        token.Token
+	Token        model.CloudToken
 	HUDEnabled   bool
 }
 

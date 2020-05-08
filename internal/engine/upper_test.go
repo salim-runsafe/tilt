@@ -66,7 +66,6 @@ import (
 	"github.com/windmilleng/tilt/internal/tiltfile"
 	"github.com/windmilleng/tilt/internal/tiltfile/k8scontext"
 	"github.com/windmilleng/tilt/internal/tiltfile/version"
-	"github.com/windmilleng/tilt/internal/token"
 	"github.com/windmilleng/tilt/internal/tracer"
 	"github.com/windmilleng/tilt/internal/watch"
 	"github.com/windmilleng/tilt/pkg/assets"
@@ -2729,7 +2728,7 @@ func TestEmptyTiltfile(t *testing.T) {
 	f.WriteFile("Tiltfile", "")
 	go func() {
 		err := f.upper.Start(f.ctx, []string{}, model.TiltBuild{}, store.EngineModeUp,
-			f.JoinPath("Tiltfile"), true, analytics.OptIn, token.Token("unit test token"),
+			f.JoinPath("Tiltfile"), true, analytics.OptIn, model.CloudToken("unit test token"),
 			"nonexistent.example.com")
 		testutils.FailOnNonCanceledErr(t, err, "upper.Start failed")
 	}()
@@ -2750,7 +2749,7 @@ func TestUpperStart(t *testing.T) {
 	f := newTestFixture(t)
 	defer f.TearDown()
 
-	tok := token.Token("unit test token")
+	tok := model.CloudToken("unit test token")
 	cloudAddress := "nonexistent.example.com"
 
 	f.WriteFile("Tiltfile", "")
@@ -2766,7 +2765,7 @@ func TestUpperStart(t *testing.T) {
 	f.withState(func(state store.EngineState) {
 		require.Equal(t, []string{"foo", "bar"}, state.UserConfigState.Args)
 		require.Equal(t, f.JoinPath("Tiltfile"), state.TiltfilePath)
-		require.Equal(t, tok, state.Token)
+		require.Equal(t, tok, state.CloudStatus.Token)
 		require.Equal(t, analytics.OptIn, state.AnalyticsEffectiveOpt())
 		require.Equal(t, cloudAddress, state.CloudAddress)
 	})
@@ -4189,7 +4188,7 @@ func (f *fakeSnapshotUploader) TakeAndUpload(state store.EngineState) (cloud.Sna
 	return cloud.SnapshotID(fmt.Sprintf("snapshot%d", f.count)), nil
 }
 
-func (f *fakeSnapshotUploader) Upload(token token.Token, teamID string, snapshot *proto_webview.Snapshot) (cloud.SnapshotID, error) {
+func (f *fakeSnapshotUploader) Upload(token model.CloudToken, teamID string, snapshot *proto_webview.Snapshot) (cloud.SnapshotID, error) {
 	panic("not implemented")
 }
 

@@ -17,7 +17,6 @@ import (
 	"github.com/windmilleng/tilt/internal/dockercompose"
 	"github.com/windmilleng/tilt/internal/hud/view"
 	"github.com/windmilleng/tilt/internal/ospath"
-	"github.com/windmilleng/tilt/internal/token"
 	"github.com/windmilleng/tilt/pkg/model"
 	"github.com/windmilleng/tilt/pkg/model/logstore"
 )
@@ -94,7 +93,6 @@ type EngineState struct {
 	Secrets model.SecretSet
 
 	CloudAddress string
-	Token        token.Token
 	TeamID       string
 
 	CloudStatus CloudStatus
@@ -111,6 +109,8 @@ type CloudStatus struct {
 	TeamName                         string
 	TokenKnownUnregistered           bool // to distinguish whether an empty Username means "we haven't checked" or "we checked and the token isn't registered"
 	WaitingForStatusPostRegistration bool
+
+	Token model.CloudToken
 }
 
 // Merge analytics opt-in status from different sources.

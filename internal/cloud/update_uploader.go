@@ -11,7 +11,6 @@ import (
 	"github.com/windmilleng/tilt/internal/cloud/cloudurl"
 	"github.com/windmilleng/tilt/internal/feature"
 	"github.com/windmilleng/tilt/internal/store"
-	"github.com/windmilleng/tilt/internal/token"
 	"github.com/windmilleng/tilt/pkg/logger"
 	"github.com/windmilleng/tilt/pkg/model"
 )
@@ -67,7 +66,7 @@ func (p updatePayload) empty() bool {
 }
 
 type updateTask struct {
-	token         token.Token
+	token         model.CloudToken
 	updatePayload updatePayload
 }
 
@@ -97,7 +96,7 @@ func (u *UpdateUploader) makeUpdates(ctx context.Context, st store.RStore) updat
 
 	// If we don't have an authenticated token or team-name,
 	// we won't be able to upload anything anyway.
-	if state.Token == "" || state.TeamID == "" || state.CloudStatus.Username == "" {
+	if state.CloudStatus.Token == "" || state.TeamID == "" || state.CloudStatus.Username == "" {
 		return updateTask{}
 	}
 
@@ -152,7 +151,7 @@ func (u *UpdateUploader) makeUpdates(ctx context.Context, st store.RStore) updat
 	u.lastCompletedBuildCount = state.CompletedBuildCount
 
 	return updateTask{
-		token: state.Token,
+		token: state.CloudStatus.Token,
 		updatePayload: updatePayload{
 			TeamID:  teamID{ID: state.TeamID},
 			Updates: updates,

@@ -39,7 +39,6 @@ import (
 	"github.com/windmilleng/tilt/internal/k8s"
 	"github.com/windmilleng/tilt/internal/store"
 	"github.com/windmilleng/tilt/internal/tiltfile"
-	"github.com/windmilleng/tilt/internal/token"
 	"github.com/windmilleng/tilt/internal/tracer"
 	"github.com/windmilleng/tilt/pkg/model"
 )
@@ -124,7 +123,7 @@ var BaseWireSet = wire.NewSet(
 	wire.Bind(new(tracer.SpanSource), new(*tracer.SpanCollector)),
 
 	dirs.UseWindmillDir,
-	token.GetOrCreateToken,
+	cloud.GetOrCreateToken,
 
 	engine.NewKINDLoader,
 
@@ -152,7 +151,7 @@ type CmdUpDeps struct {
 	Hud          hud.HeadsUpDisplay
 	Upper        engine.Upper
 	TiltBuild    model.TiltBuild
-	Token        token.Token
+	Token        model.CloudToken
 	CloudAddress cloudurl.Address
 	Store        *store.Store
 }
@@ -170,7 +169,7 @@ func wireCmdCI(ctx context.Context, analytics *analytics.TiltAnalytics) (CmdCIDe
 type CmdCIDeps struct {
 	Upper        engine.Upper
 	TiltBuild    model.TiltBuild
-	Token        token.Token
+	Token        model.CloudToken
 	CloudAddress cloudurl.Address
 	Store        *store.Store
 }

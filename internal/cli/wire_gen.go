@@ -47,7 +47,6 @@ import (
 	"github.com/windmilleng/tilt/internal/tiltfile"
 	"github.com/windmilleng/tilt/internal/tiltfile/k8scontext"
 	"github.com/windmilleng/tilt/internal/tiltfile/version"
-	"github.com/windmilleng/tilt/internal/token"
 	"github.com/windmilleng/tilt/internal/tracer"
 	"github.com/windmilleng/tilt/pkg/model"
 )
@@ -263,7 +262,7 @@ func wireCmdUp(ctx context.Context, hudEnabled hud.HudEnabled, analytics3 *analy
 	if err != nil {
 		return CmdUpDeps{}, err
 	}
-	tokenToken, err := token.GetOrCreateToken(windmillDir)
+	cloudToken, err := cloud.GetOrCreateToken(windmillDir)
 	if err != nil {
 		return CmdUpDeps{}, err
 	}
@@ -271,7 +270,7 @@ func wireCmdUp(ctx context.Context, hudEnabled hud.HudEnabled, analytics3 *analy
 		Hud:          headsUpDisplay,
 		Upper:        upper,
 		TiltBuild:    tiltBuild,
-		Token:        tokenToken,
+		Token:        cloudToken,
 		CloudAddress: address,
 		Store:        storeStore,
 	}
@@ -418,14 +417,14 @@ func wireCmdCI(ctx context.Context, analytics3 *analytics.TiltAnalytics) (CmdCID
 	if err != nil {
 		return CmdCIDeps{}, err
 	}
-	tokenToken, err := token.GetOrCreateToken(windmillDir)
+	cloudToken, err := cloud.GetOrCreateToken(windmillDir)
 	if err != nil {
 		return CmdCIDeps{}, err
 	}
 	cmdCIDeps := CmdCIDeps{
 		Upper:        upper,
 		TiltBuild:    tiltBuild,
-		Token:        tokenToken,
+		Token:        cloudToken,
 		CloudAddress: address,
 		Store:        storeStore,
 	}
@@ -618,14 +617,14 @@ var BaseWireSet = wire.NewSet(
 	provideWebURL,
 	provideWebPort,
 	provideWebHost,
-	provideNoBrowserFlag, server.ProvideHeadsUpServer, provideAssetServer, server.ProvideHeadsUpServerController, tracer.NewSpanCollector, wire.Bind(new(trace2.SpanProcessor), new(*tracer.SpanCollector)), wire.Bind(new(tracer.SpanSource), new(*tracer.SpanCollector)), dirs.UseWindmillDir, token.GetOrCreateToken, engine.NewKINDLoader, wire.Value(feature.MainDefaults),
+	provideNoBrowserFlag, server.ProvideHeadsUpServer, provideAssetServer, server.ProvideHeadsUpServerController, tracer.NewSpanCollector, wire.Bind(new(trace2.SpanProcessor), new(*tracer.SpanCollector)), wire.Bind(new(tracer.SpanSource), new(*tracer.SpanCollector)), dirs.UseWindmillDir, cloud.GetOrCreateToken, engine.NewKINDLoader, wire.Value(feature.MainDefaults),
 )
 
 type CmdUpDeps struct {
 	Hud          hud.HeadsUpDisplay
 	Upper        engine.Upper
 	TiltBuild    model.TiltBuild
-	Token        token.Token
+	Token        model.CloudToken
 	CloudAddress cloudurl.Address
 	Store        *store.Store
 }
@@ -633,7 +632,7 @@ type CmdUpDeps struct {
 type CmdCIDeps struct {
 	Upper        engine.Upper
 	TiltBuild    model.TiltBuild
-	Token        token.Token
+	Token        model.CloudToken
 	CloudAddress cloudurl.Address
 	Store        *store.Store
 }

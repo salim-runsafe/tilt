@@ -107,7 +107,7 @@ func (fh funcHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *HeadsUpServer) cookieWrapper(handler http.Handler) http.Handler {
 	return funcHandler{f: func(w http.ResponseWriter, r *http.Request) {
 		state := s.store.RLockState()
-		http.SetCookie(w, &http.Cookie{Name: TiltTokenCookieName, Value: string(state.Token), Path: "/"})
+		http.SetCookie(w, &http.Cookie{Name: TiltTokenCookieName, Value: string(state.CloudStatus.Token), Path: "/"})
 		s.store.RUnlockState()
 		handler.ServeHTTP(w, r)
 	}}
@@ -319,7 +319,7 @@ func (codec timeAllowEmptyDecoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Ite
 
 func (s *HeadsUpServer) HandleNewSnapshot(w http.ResponseWriter, req *http.Request) {
 	st := s.store.RLockState()
-	token := st.Token
+	token := st.CloudStatus.Token
 	teamID := st.TeamID
 	s.store.RUnlockState()
 

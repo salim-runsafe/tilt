@@ -58,7 +58,7 @@ func TestWhoAmI(t *testing.T) {
 			f.httpClient.SetResponse(string(respBytes))
 			f.Run(func(state *store.EngineState) {
 				state.TeamID = tc.teamID
-				state.Token = "test token"
+				state.CloudStatus.Token = "test token"
 				state.TiltBuildInfo.Version = "test tilt version"
 			})
 			req := f.waitForRequest(fmt.Sprintf("https://%s/api/whoami", testCloudAddress))
@@ -98,7 +98,7 @@ func TestStatusRefresh(t *testing.T) {
 
 	f.httpClient.SetResponse(`{"Username": "user1", "Found": true, "SuggestedTiltVersion": "10.0.0"}`)
 	f.Run(func(state *store.EngineState) {
-		state.Token = "test token"
+		state.CloudStatus.Token = "test token"
 		state.TiltBuildInfo.Version = "test tilt version"
 	})
 
@@ -115,7 +115,7 @@ func TestStatusRefresh(t *testing.T) {
 	f.httpClient.SetResponse(`{"Username": "user2", "Found": true}`)
 	f.Run(func(state *store.EngineState) {
 		state.TeamID = "test team id"
-		state.Token = "test token"
+		state.CloudStatus.Token = "test token"
 		state.TiltBuildInfo.Version = "test tilt version"
 	})
 
